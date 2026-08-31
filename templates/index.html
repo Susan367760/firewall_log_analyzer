@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Firewall Log Analyzer | Network Defense Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🛡️
+            </div>
+
+            <div class="brand-text">
+
+                <h2>
+                    Firewall Analyzer
+                </h2>
+
+                <span>
+                    Network Defense
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="#overview"
+                class="nav-item active"
+            >
+                <span>▣</span>
+                Overview
+            </a>
+
+
+            <a
+                href="#alerts"
+                class="nav-item"
+            >
+                <span>⚠</span>
+                Security Alerts
+
+                {% if alerts %}
+                    <span class="nav-badge">
+                        {{ alerts|length }}
+                    </span>
+                {% endif %}
+
+            </a>
+
+
+            <a
+                href="#traffic"
+                class="nav-item"
+            >
+                <span>◈</span>
+                Traffic Analysis
+            </a>
+
+
+            <a
+                href="#events"
+                class="nav-item"
+            >
+                <span>☷</span>
+                Firewall Events
+            </a>
+
+
+            <a
+                href="#reports"
+                class="nav-item"
+            >
+                <span>▤</span>
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <div class="status-dot"></div>
+
+            <div>
+
+                <strong>
+                    Analyzer Online
+                </strong>
+
+                <span>
+                    Monitoring firewall logs
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <span class="eyebrow">
+                    SECURITY OPERATIONS
+                </span>
+
+                <h1>
+                    Firewall Log Analyzer
+                </h1>
+
+                <p>
+                    Understanding Network Defense
+                </p>
+
+            </div>
+
+
+            <div class="topbar-status">
+
+                <span class="online-indicator"></span>
+
+                <span>
+                    Analysis Active
+                </span>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             OVERVIEW
+        ================================================== -->
+
+        <section
+            id="overview"
+            class="dashboard-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        OVERVIEW
+                    </span>
+
+                    <h2>
+                        Firewall Activity
+                    </h2>
+
+                </div>
+
+                <span class="data-source">
+                    Source: firewall.log
+                </span>
+
+            </div>
+
+
+            <!-- =============================================
+                 STATISTICS
+            ============================================== -->
+
+            <div class="stats-grid">
+
+
+                <!-- Total Events -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        📊
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Total Events
+                        </span>
+
+                        <strong>
+                            {{ statistics.total_events }}
+                        </strong>
+
+                        <small>
+                            Network events analyzed
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Accepted -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        ✓
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Accepted
+                        </span>
+
+                        <strong>
+                            {{ statistics.accepted }}
+                        </strong>
+
+                        <small>
+                            Allowed connections
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Dropped -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        ✕
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Dropped
+                        </span>
+
+                        <strong>
+                            {{ statistics.dropped }}
+                        </strong>
+
+                        <small>
+                            Blocked connections
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Alerts -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon orange">
+                        ⚠
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Security Alerts
+                        </span>
+
+                        <strong>
+                            {{ alerts|length }}
+                        </strong>
+
+                        <small>
+                            Detected by rules engine
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Source IPs -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        ◉
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Source IPs
+                        </span>
+
+                        <strong>
+                            {{ statistics.unique_source_ips }}
+                        </strong>
+
+                        <small>
+                            Unique sources
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Destination IPs -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon cyan">
+                        ◎
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>
+                            Destination IPs
+                        </span>
+
+                        <strong>
+                            {{ statistics.unique_destination_ips }}
+                        </strong>
+
+                        <small>
+                            Unique destinations
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             REPORT ACTIONS
+        ================================================== -->
+
+        <section
+            id="reports"
+            class="report-actions"
+        >
+
+            <div class="report-info">
+
+                <span class="eyebrow">
+                    SECURITY REPORTING
+                </span>
+
+                <h3>
+                    Generate Security Reports
+                </h3>
+
+                <p>
+                    Export the latest firewall analysis
+                    for investigation and documentation.
+                </p>
+
+            </div>
+
+
+            <div class="report-buttons">
+
+
+                <a
+                    href="{{ url_for('download_csv') }}"
+                    class="report-button csv-button"
+                >
+
+                    <span class="report-button-icon">
+                        📊
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Download CSV
+                        </strong>
+
+                        <small>
+                            Firewall event data
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+
+                <a
+                    href="{{ url_for('download_pdf') }}"
+                    class="report-button pdf-button"
+                >
+
+                    <span class="report-button-icon">
+                        📄
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Download PDF
+                        </strong>
+
+                        <small>
+                            Security analysis report
+                        </small>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TRAFFIC ANALYSIS
+        ================================================== -->
+
+        <section
+            id="traffic"
+            class="dashboard-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        TRAFFIC ANALYSIS
+                    </span>
+
+                    <h2>
+                        Network Traffic Insights
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="charts-grid">
+
+
+                <!-- Traffic Actions -->
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Traffic Decisions
+                            </h3>
+
+                            <p>
+                                Accepted vs. dropped connections
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas id="actionsChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Protocols -->
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Protocol Distribution
+                            </h3>
+
+                            <p>
+                                Network protocols observed
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas id="protocolChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Top Source IPs -->
+
+                <div class="chart-card large-chart">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Top Source IPs
+                            </h3>
+
+                            <p>
+                                Sources generating the most traffic
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas id="sourceIpChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Destination Ports -->
+
+                <div class="chart-card large-chart">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Destination Ports
+                            </h3>
+
+                            <p>
+                                Most frequently targeted services
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas id="portChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECURITY ALERTS
+        ================================================== -->
+
+        <section
+            id="alerts"
+            class="dashboard-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        THREAT DETECTION
+                    </span>
+
+                    <h2>
+                        Security Alerts
+                    </h2>
+
+                </div>
+
+                <span class="alert-count">
+                    {{ alerts|length }} detected
+                </span>
+
+            </div>
+
+
+            {% if alerts %}
+
+            <div class="alerts-container">
+
+                {% for alert in alerts %}
+
+                <div class="alert-card
+                    {% if alert.severity == 'HIGH' %}
+                        high-alert
+                    {% elif alert.severity == 'MEDIUM' %}
+                        medium-alert
+                    {% else %}
+                        low-alert
+                    {% endif %}
+                ">
+
+
+                    <div class="alert-severity">
+
+                        {% if alert.severity == 'HIGH' %}
+                            🔴
+                        {% elif alert.severity == 'MEDIUM' %}
+                            🟠
+                        {% else %}
+                            🟢
+                        {% endif %}
+
+                        <span>
+                            {{ alert.severity }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="alert-main">
+
+                        <h3>
+                            {{ alert.type }}
+                        </h3>
+
+                        <p>
+                            {{ alert.description }}
+                        </p>
+
+
+                        {% if alert.src_ip %}
+
+                        <div class="alert-source">
+
+                            <span>
+                                Source IP
+                            </span>
+
+                            <code>
+                                {{ alert.src_ip }}
+                            </code>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if alert.ports %}
+
+                        <div class="alert-source">
+
+                            <span>
+                                Ports
+                            </span>
+
+                            <code>
+                                {{ alert.ports }}
+                            </code>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="alert-type">
+
+                        <span>
+                            DETECTION
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="no-alerts">
+
+                <div class="no-alerts-icon">
+                    ✓
+                </div>
+
+                <h3>
+                    No Security Alerts
+                </h3>
+
+                <p>
+                    The current firewall log did not
+                    trigger any configured detection rules.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =================================================
+             EVENT TABLE
+        ================================================== -->
+
+        <section
+            id="events"
+            class="dashboard-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        FIREWALL TELEMETRY
+                    </span>
+
+                    <h2>
+                        Firewall Events
+                    </h2>
+
+                </div>
+
+                <span class="event-count">
+                    {{ events|length }} events
+                </span>
+
+            </div>
+
+
+            <div class="table-card">
+
+
+                <!-- Search -->
+
+                <div class="table-toolbar">
+
+                    <div class="search-box">
+
+                        <span>
+                            🔎
+                        </span>
+
+                        <input
+                            type="text"
+                            id="eventSearch"
+                            placeholder="Search IP, protocol, port or action..."
+                        >
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <select id="actionFilter">
+
+                            <option value="ALL">
+                                All Actions
+                            </option>
+
+                            <option value="ACCEPT">
+                                ACCEPT
+                            </option>
+
+                            <option value="DROP">
+                                DROP
+                            </option>
+
+                        </select>
+
+
+                        <select id="protocolFilter">
+
+                            <option value="ALL">
+                                All Protocols
+                            </option>
+
+                            <option value="TCP">
+                                TCP
+                            </option>
+
+                            <option value="UDP">
+                                UDP
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Table -->
+
+                <div class="table-wrapper">
+
+                    <table id="eventsTable">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    #
+                                </th>
+
+                                <th>
+                                    Timestamp
+                                </th>
+
+                                <th>
+                                    Source IP
+                                </th>
+
+                                <th>
+                                    Source Port
+                                </th>
+
+                                <th>
+                                    Destination IP
+                                </th>
+
+                                <th>
+                                    Destination Port
+                                </th>
+
+                                <th>
+                                    Protocol
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for event in events %}
+
+                            <tr>
+
+                                <td class="event-number">
+                                    {{ loop.index }}
+                                </td>
+
+                                <td>
+                                    {{ event.timestamp }}
+                                </td>
+
+                                <td>
+
+                                    <code>
+                                        {{ event.src_ip }}
+                                    </code>
+
+                                </td>
+
+                                <td>
+                                    {{ event.src_port }}
+                                </td>
+
+                                <td>
+
+                                    <code>
+                                        {{ event.dst_ip }}
+                                    </code>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="port-value">
+                                        {{ event.dst_port }}
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="protocol-badge">
+                                        {{ event.protocol }}
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    {% if event.action == "DROP" %}
+
+                                    <span class="action-badge drop">
+                                        DROP
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="action-badge accept">
+                                        ACCEPT
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div
+                    id="noSearchResults"
+                    class="no-search-results"
+                >
+                    No matching firewall events found.
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="dashboard-footer">
+
+            <div>
+
+                <strong>
+                    Firewall Log Analyzer
+                </strong>
+
+                <span>
+                    Project 8 — Understanding Network Defense
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Built with Python • Flask • Pandas
+                </span>
+
+                <span class="footer-divider">
+                    |
+                </span>
+
+                <strong>
+                    #CyberBuildsBySusan
+                </strong>
+
+            </div>
+
+        </footer>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         CHART DATA
+    ====================================================== -->
+
+    <script>
+
+        const chartData = {{ chart_data | tojson }};
+
+    </script>
+
+
+    <script
+        src="{{ url_for('static', filename='js/dashboard.js') }}"
+    ></script>
+
+</body>
+
+</html>
